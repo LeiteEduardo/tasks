@@ -17,7 +17,7 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
-        return new AuthResource( $this->authService->login($request->only('email', 'password')) );
+        return $this->authService->login($request->only('email', 'password'));
     }
 
     public function register(RegisterRequest $request)

@@ -16,12 +16,15 @@ class AuthService
     public function login($credentials)
     {
         if (Auth::attempt($credentials)) {
-            return Auth::user();
+            return response()->json([
+                'message'   => 'Authorized',
+                'token'     => [ 'type' => 'Bearer', 'token' => Auth::user()->createToken('token')->plainTextToken ]
+            ], 200);
         }
 
-        throw ValidationException::withMessages([
-            'email' => ['The provided credentials are incorrect.'],
-        ]);
+        return response()->json([
+            'message'   => 'Unauthorized'
+        ], 401);
     }
 
     public function register(array $data)
