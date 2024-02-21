@@ -4,7 +4,7 @@ namespace App\Service;
 
 use App\Models\User;
 use App\Repositories\UserRepository;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth;
 
 class UserService
 {
@@ -23,15 +23,48 @@ class UserService
         return $this->userRepository->store($data);
     }
 
-    public function storeRegularUser(array $data, User $user)
+    public function storeRegularUser(array $data, User $master)
     {
-        if ( $user->type != "master" ) {
-            throw ValidationException::withMessages(['error' => 'Unauthorized']);
+        if ( $master->type != "master" ) {
+            abort(401);
         }
 
         $data['type'] = 'regular';
-        $data['master_id'] = $user->id;
+        $data['master_id'] = $master->id;
 
         return $this->userRepository->store($data);
+    }
+
+    public function update(array $data, string $id ,User $master)
+    {
+        $this->find($id, $master);
+        
+        return $this->userRepository->update($id, $data);
+    }
+
+    public function find(string $id, User $master)
+    {
+        if ($master->type !== 'master') {
+            abort(401);
+        }
+
+        $user = $this->userRepository->find($id);
+        
+        if (!$user || (!$master->regularUsers->contains($user) && $master->id != $id)) {
+            abort(404);
+        }
+
+        return $user;
+    }
+
+    public function destroy(string $id)
+    {
+        $master = Auth::user();
+
+        $this->find($id, $master);
+
+        $this->userRepository->delete($id);
+
+        return 'User deleted!';
     }
 }

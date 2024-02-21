@@ -14,7 +14,7 @@ class BaseRepository
         return $this->obj->all();
     }
 
-    public function find(int $id): object
+    public function find(int $id): ?object
     {
         return $this->obj->find($id);
     }
@@ -37,10 +37,18 @@ class BaseRepository
 
     public function update(int $id, array $attributes): object
     {
-        return $this->obj->find($id)->update($attributes);
+        $user = $this->obj->find($id);
+
+        if (!$user) {
+            abort(404);
+        }
+
+        $user->update($attributes);
+
+        return $user;
     }
 
-    public function delete(int $id): object
+    public function delete(int $id): bool
     {
         return $this->obj->find($id)->delete();
     }
