@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\v1;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Resources\v1\AuthResource;
 use App\Service\AuthService;
 
 class AuthController extends Controller
@@ -15,22 +17,16 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
-        $user = $this->authService->login($request->only('email', 'password'));
-
-        return response()->json($user);
+        return new AuthResource( $this->authService->login($request->only('email', 'password')) );
     }
 
     public function register(RegisterRequest $request)
     {
-        $user = $this->authService->register($request->validated());
-
-        return response()->json($user);
+        return new AuthResource( $this->authService->register($request->validated()) );
     }
 
     public function myUser()
     {
-        $user = $this->authService->myUser();
-
-        return response()->json($user);
+        return new AuthResource( $this->authService->myUser() );
     }
 }
