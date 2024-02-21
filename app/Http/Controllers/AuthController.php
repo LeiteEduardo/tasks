@@ -15,17 +15,22 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
-        $credentials = $request->only('email', 'password');
-        $token = $this->authService->login($credentials);
+        $user = $this->authService->login($request->only('email', 'password'));
 
-        return response()->json(['access_token' => $token, 'token_type' => 'Bearer']);
+        return response()->json($user);
     }
 
     public function register(RegisterRequest $request)
     {
         $user = $this->authService->register($request->validated());
-        $token = $user->createToken('token-name')->plainTextToken;
 
-        return response()->json(['access_token' => $token, 'token_type' => 'Bearer']);
+        return response()->json($user);
+    }
+
+    public function myUser()
+    {
+        $user = $this->authService->myUser();
+
+        return response()->json($user);
     }
 }

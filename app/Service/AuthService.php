@@ -17,7 +17,9 @@ class AuthService
     {
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
-            return $user->createToken('token')->plainTextToken;
+            $token = $user->createToken('token')->plainTextToken;
+
+            return ['access_token' => $token, 'token_type' => 'Bearer'];
         }
 
         throw ValidationException::withMessages([
@@ -27,6 +29,17 @@ class AuthService
 
     public function register(array $data)
     {
-        return $this->userRepository->store($data);;
+        $user = $this->userRepository->store($data);
+        $token = $user->createToken('token')->plainTextToken;
+
+        return ['user' => $user, 'access_token' => $token, 'token_type' => 'Bearer'];
+    }
+
+    public function myUser()
+    {
+        $user = $this->userRepository->find(Auth::user()->id);
+        $token = $user->createToken('token')->plainTextToken;
+
+        return ['user' => $user, 'access_token' => $token, 'token_type' => 'Bearer'];
     }
 }
