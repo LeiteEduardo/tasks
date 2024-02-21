@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UserStoreRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Service\UserService;
-use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -22,29 +21,21 @@ class UserController extends Controller
 
     public function store(UserStoreRequest $request)
     {
-        $user = $this->userService->storeRegularUser($request->validated(), $request->user());
-
-        return response()->json($user);
+        return $this->userService->storeRegularUser($request->validated(), $request->user());
     }
 
     public function show(string $id)
     {
-        $user = $this->userService->find($id, Auth::user());
-
-        return response()->json($user);
+        return $this->userService->find($id);
     }
 
     public function update(UserUpdateRequest $request, string $id)
     {
-        $user = $this->userService->update($request->validated(), $id, $request->user());
-
-        return response()->json($user);
+        return $this->userService->update($request->validated(), $id, $request->user());
     }
 
     public function destroy(string $id)
     {
-        $user = $this->userService->destroy($id);
-
-        return response()->json($user);
+        return $this->userService->destroy($id);
     }
 }

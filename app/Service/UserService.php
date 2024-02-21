@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Http\Resources\v1\UserResource;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Auth;
@@ -15,46 +16,54 @@ class UserService
 
     public function getAllUsers()
     {
-        return $this->userRepository->all();
+        return UserResource::collection( $this->userRepository->all() );
     }
 
     public function store(array $data)
     {
-        return $this->userRepository->store($data);
+        return new UserResource( $this->userRepository->store($data) );
     }
 
     public function storeRegularUser(array $data, User $master)
     {
         if ( $master->type != "master" ) {
-            abort(401);
+            return response()->json([
+                'message'   => 'Unauthorized'
+            ], 401);
         }
 
         $data['type'] = 'regular';
         $data['master_id'] = $master->id;
 
-        return $this->userRepository->store($data);
+        return new UserResource( $this->userRepository->store($data) ); 
     }
 
     public function update(array $data, string $id ,User $master)
     {
         $this->find($id, $master);
         
-        return $this->userRepository->update($id, $data);
+        return new UserResource( $this->userRepository->update($id, $data) );
     }
 
-    public function find(string $id, User $master)
+    public function find(string $id)
     {
+        $master = Auth::user();
+
         if ($master->type !== 'master') {
-            abort(401);
+            return response()->json([
+                'message'   => 'Unauthorized'
+            ], 401);
         }
 
         $user = $this->userRepository->find($id);
         
         if (!$user || (!$master->regularUsers->contains($user) && $master->id != $id)) {
-            abort(404);
+            return response()->json([
+                'message'   => 'Not Found'
+            ], 404);
         }
 
-        return $user;
+        return new UserResource( $user );
     }
 
     public function destroy(string $id)
@@ -65,6 +74,8 @@ class UserService
 
         $this->userRepository->delete($id);
 
-        return 'User deleted!';
+        return response()->json([
+            'message'   => 'User deleted!'
+        ], 200);
     }
 }
