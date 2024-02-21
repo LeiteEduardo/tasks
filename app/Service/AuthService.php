@@ -32,6 +32,15 @@ class AuthService
         return $this->userRepository->store($data);
     }
 
+    public function logout($request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message'   => 'Token Revoked'
+        ], 200);
+    }
+
     public function myUser()
     {
         return $this->userRepository->find(Auth::user()->id);

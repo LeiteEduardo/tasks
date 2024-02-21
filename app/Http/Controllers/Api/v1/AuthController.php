@@ -7,6 +7,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Resources\v1\AuthResource;
 use App\Service\AuthService;
+use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
@@ -23,6 +24,11 @@ class AuthController extends Controller
     public function register(RegisterRequest $request)
     {
         return new AuthResource( $this->authService->register($request->validated()) );
+    }
+
+    public function logout(Request $request)
+    {
+        return $this->authService->logout($request);
     }
 
     public function myUser()
