@@ -14,9 +14,17 @@ class TaskService
         $this->taskRepository = $taskRepository;
     }
 
-    public function all()
+    public function all($request)
     {
-        return TaskResource::collection( $this->taskRepository->all() );
+        $filters = [
+            'id' => $request->query('id'),
+            'title' => $request->query('title'),
+            'status' => $request->query('status')
+        ];
+        
+        $tasks = $this->taskRepository->paginate(10, $filters);
+    
+        return TaskResource::collection( $tasks );
     }
 
     public function store(array $data, User $master)

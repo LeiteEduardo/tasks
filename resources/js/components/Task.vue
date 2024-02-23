@@ -5,7 +5,19 @@
                 <card-component title="Search Task">
                     <template v-slot:content>
                         <div class="row">
-                            <div class="col-lg-6 mb-3">
+                            
+                            <div class="col-lg-4 mb-3">
+                                <input-container-component 
+                                    id="taskId" 
+                                    title="TaskId"
+                                    helper-id="taskIdHelp"
+                                    helper-text="Optional. Insert Task ID"
+                                >
+                                    <input type="number" class="form-control" id="taskId" placeholder="Task ID" aria-describedby="taskIdHelp" v-model="search.id">
+                                </input-container-component>
+                            </div>
+
+                            <div class="col-lg-4 mb-3">
                                 <input-container-component 
                                     id="task" 
                                     title="Task"
@@ -13,6 +25,21 @@
                                     helper-text="Optional. Insert Task title"
                                 >
                                     <input type="text" class="form-control" id="task" placeholder="Task title" aria-describedby="taskHelp" v-model="search.title">
+                                </input-container-component>
+                            </div>
+
+                            <div class="col-lg-4 mb-3">
+                                <input-container-component 
+                                    id="taskStatus" 
+                                    title="TaskStatus"
+                                    helper-id="taskStatusHelp"
+                                    helper-text="Optional. Insert Task status"
+                                >
+                                <select class="form-select" id="taskStatus" aria-label="Default select example" aria-describedby="taskStatusHelp" v-model="search.status">
+                                    <option value="Not Started">Not Started</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Completed">Completed</option>
+                                </select>
                                 </input-container-component>
                             </div>
                         </div>
@@ -282,7 +309,7 @@ import axios from 'axios';
                 storeDetails: {},
                 tasks: { data: [] },
                 tasksLinks: [],
-                search: { title: ''}
+                search: { id: '', title: '', status: ''}
             }
         },
         methods: {
@@ -352,13 +379,25 @@ import axios from 'axios';
 
             },
             searching() {
+                
+                let filter = '';
+                for(let key in this.search) {
+                    if ( this.search[key] ) {
+                        if (filter != '') {
+                            filter += '&';
+                        }
+    
+                        filter += key + '=' + this.search[key]
+                    }
+                }
+                
                 let config = {
                     headers: {
                         'Accept': 'application/json',
                         'Authorization': this.token
                     }
                 }
-                let url = this.url + '/title/' + this.search[`title`];
+                let url = this.url + '?' + filter;
                 axios.get(url, config)
                     .then(response => {
                         this.tasks = response.data;

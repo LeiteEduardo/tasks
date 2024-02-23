@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Service\TaskService;
+use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
@@ -14,9 +15,9 @@ class TaskController extends Controller
         $this->taskService = $taskService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        return $this->taskService->all();
+        return $this->taskService->all($request);
     }
 
     public function store(StoreTaskRequest $request)
