@@ -28,6 +28,7 @@ const store = createStore({
 import Login from './components/Login.vue';
 import Home from './components/Home.vue';
 import Task from './components/Task.vue';
+import User from './components/User.vue';
 import InputContainer from './components/InputContainer.vue';
 import Table from './components/Table.vue';
 import Card from './components/Card.vue';
@@ -38,6 +39,7 @@ import Paginate from './components/Paginate.vue';
 app.component('login-component', Login);
 app.component('home-component', Home);
 app.component('task-component', Task);
+app.component('user-component', User);
 app.component('input-container-component', InputContainer);
 app.component('table-component', Table);
 app.component('card-component', Card);

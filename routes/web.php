@@ -24,3 +24,7 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::get('/tasks', function () {
     return view('app.tasks.index');
 })->name('tasks')->middleware('auth');
+
+Route::get('/users', function () {
+    return view('app.users.index');
+})->name('users')->middleware('auth');

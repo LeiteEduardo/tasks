@@ -31,19 +31,11 @@
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav me-auto">
                         @auth
-                            <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Users</a>
-                                <div class="dropdown-menu">
-                                    <a href="#" class="dropdown-item">List</a>
-                                    <a href="#" class="dropdown-item">Create</a>
-                                </div>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('users')}}">Users</a>
                             </li>
-                            <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Tasks</a>
-                                <div class="dropdown-menu">
-                                    <a href="{{ route('tasks') }}" class="dropdown-item">List</a>
-                                    <a href="#" class="dropdown-item">Create</a>
-                                </div>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('tasks') }}">Tasks</a>
                             </li>
                         @endauth
                     </ul>
