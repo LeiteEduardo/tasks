@@ -9,4 +9,5 @@ Route::prefix('v1')->group(function(){
     Route::get('/myuser', [\App\Http\Controllers\Api\v1\AuthController::class, 'myUser'])->middleware('auth:sanctum');
     
     Route::apiResource('/users', \App\Http\Controllers\Api\v1\UserController::class)->middleware('auth:sanctum');
+    Route::apiResource('/tasks', \App\Http\Controllers\Api\v1\TaskController::class)->middleware('auth:sanctum');
 });
