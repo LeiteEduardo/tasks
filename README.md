@@ -46,6 +46,6 @@ Este projeto gerencia as tarefas de um time.
     ``` 
 7. Acesse a aplicação utilizando o seguinte acesso gerado:
     ```
-    Login: user@email.com
+    Login: admin@email.com
     Password: 12345678
     ```
