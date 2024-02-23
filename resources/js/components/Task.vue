@@ -36,9 +36,9 @@
                                 'finish_date': {title: 'Finish Data', type: 'date'}
                         }" 
                             :data="this.tasks.data"
-                            :view="true"
-                            :edit="true"
-                            :delete="true"
+                            :view="{ visible: true, dataToggle: 'modal', dataTarget: '#modalTaskView'}"
+                            :edit="{ visible: true, dataToggle: 'modal', dataTarget: '#modalTaskUpdate'}"
+                            :destroy="{ visible: true, dataToggle: 'modal', dataTarget: '#modalTaskDelete'}"
                         ></table-component>
                     </template>
                     <template v-slot:footer>
@@ -124,50 +124,124 @@
     <modal-component id="modalTaskView" title="View Task">
 
         <template v-slot:alert>
-            <alert-component type="success" :details="storeDetails" title="Success" v-if="storeStatus == 'Created'"></alert-component>
-            <alert-component type="danger" :details="storeDetails" title="Error" v-if="storeStatus == 'Error'"></alert-component>
+        </template>
+
+        <template v-slot:content>
+
+            <input-container-component id="viewId" title="Id" helper-id="" helper-text="">
+                <input type="text" class="form-control" :value="$store.state.item.id" disabled>
+            </input-container-component>
+
+            <input-container-component id="viewTitle" title="Title" helper-id="" helper-text="">
+                <input type="text" class="form-control" :value="$store.state.item.title" disabled>
+            </input-container-component>
+
+            <input-container-component id="viewDesc" title="Description" helper-id="" helper-text="">
+                <input type="text" class="form-control" :value="$store.state.item.description" disabled>
+            </input-container-component>
+
+            <input-container-component id="viewStatus" title="Status" helper-id="" helper-text="">
+                <input type="text" class="form-control" :value="$store.state.item.status" disabled>
+            </input-container-component>
+
+        </template>
+
+        <template v-slot:footer>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </template>
+
+    </modal-component>
+
+    <modal-component id="modalTaskDelete" title="Delete Task">
+
+        <template v-slot:alert>
+            <alert-component type="success" :details="$store.state.transaction" title="Success" v-if="$store.state.transaction.status == 'success'"></alert-component>
+            <alert-component type="danger" :details="$store.state.transaction" title="Error" v-if="$store.state.transaction.status == 'error'"></alert-component>
+        </template>
+
+        <template v-slot:content v-if="$store.state.transaction.status != 'success'">
+            <input-container-component id="viewId" title="Id" helper-id="" helper-text="">
+                <input type="text" class="form-control" :value="$store.state.item.id" disabled>
+            </input-container-component>
+
+            <input-container-component id="viewTitle" title="Title" helper-id="" helper-text="">
+                <input type="text" class="form-control" :value="$store.state.item.title" disabled>
+            </input-container-component>
+
+            <input-container-component id="viewDesc" title="Description" helper-id="" helper-text="">
+                <input type="text" class="form-control" :value="$store.state.item.description" disabled>
+            </input-container-component>
+
+        </template>
+
+        <template v-slot:footer>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-danger" @click="destroy()" v-if="$store.state.transaction.status != 'success'">Remove</button>
+        </template>
+
+    </modal-component>
+
+    <modal-component id="modalTaskUpdate" title="Update Task">
+
+        <template v-slot:alert>
+            <alert-component type="success" :details="$store.state.transaction" title="Success" v-if="$store.state.transaction.status == 'success'"></alert-component>
+            <alert-component type="danger" :details="$store.state.transaction" title="Error" v-if="$store.state.transaction.status == 'error'"></alert-component>
         </template>
 
         <template v-slot:content>
             <div class="form-group mb-2">
                 <input-container-component 
-                    id="storeTask" 
+                    id="updateTask" 
                     title="Task"
-                    helper-id="storeTaskHelp"
+                    helper-id="updateTaskHelp"
                     helper-text="Required. Insert Task name"
                 >
-                    <input type="text" class="form-control" id="storeTask" placeholder="Task name" aria-describedby="storeTaskHelp" v-model="storeTask" required>
+                    <input type="text" class="form-control" id="updateTask" placeholder="Task title" aria-describedby="updateTaskHelp" v-model="$store.state.item.title" required>
                 </input-container-component>
             </div>
             <div class="form-group mb-2">
                 <input-container-component 
-                    id="storeTaskDesc" 
+                    id="updateTaskDesc" 
                     title="Description"
-                    helper-id="storeTaskDescHelp"
+                    helper-id="updateTaskDescHelp"
                     helper-text="Required. Insert Task description"
                 >
-                    <input type="text" class="form-control" id="storeTaskDesc" placeholder="Description" aria-describedby="storeTaskDescHelp" v-model="storeTaskDesc" required>
+                    <input type="text" class="form-control" id="updateTaskDesc" placeholder="Description" aria-describedby="updateTaskDescHelp" v-model="$store.state.item.description" required>
+                </input-container-component>
+            </div>
+            <div class="form-group mb-2">
+                <input-container-component 
+                    id="updateTaskStatus" 
+                    title="Status"
+                    helper-id="updateTaskStatusHelp"
+                    helper-text="Required. Insert Task Status"
+                >
+                    <select class="form-select" id="updateTaskStatus" aria-label="Default select example" aria-describedby="updateTaskStatusHelp" v-model="$store.state.item.status" required>
+                        <option value="Not Started" :selected="$store.state.item.status == 'Not Started'">Not Started</option>
+                        <option value="In Progress" :selected="$store.state.item.status == 'In Progress'">In Progress</option>
+                        <option value="Completed" :selected="$store.state.item.status == 'Completed'">Completed</option>
+                    </select>
                 </input-container-component>
             </div>
             <div class="row">
                 <div class="form-group col-6">
                     <input-container-component 
-                        id="storeStartDate" 
+                        id="updateStartDate" 
                         title="Start Date"
-                        helper-id="storeStartDateHelp"
+                        helper-id="updateStartDateHelp"
                         helper-text="Required. Insert Task start date"
                     >
-                        <input type="date" class="form-control" id="storeStartDate" placeholder="Start Date" aria-describedby="storeStartDateHelp" v-model="storeStartDate" required>
+                        <input type="date" class="form-control" id="updateStartDate" placeholder="Start Date" aria-describedby="updateStartDateHelp" v-model="$store.state.item.start_date" required>
                     </input-container-component>
                 </div>
                 <div class="form-group col-6">
                     <input-container-component 
-                        id="storeEndDate" 
+                        id="updateEndDate" 
                         title="End Date"
-                        helper-id="storeEndDateHelp"
+                        helper-id="updateEndDateHelp"
                         helper-text="Required. Insert Task end date"
                     >
-                        <input type="date" class="form-control" id="storeEndDate" placeholder="End Date" aria-describedby="storeEndDateHelp" v-model="storeEndDate" required>
+                        <input type="date" class="form-control" id="updateEndDate" placeholder="End Date" aria-describedby="updateEndDateHelp" v-model="$store.state.item.end_date" required>
                     </input-container-component>
                 </div>
             </div>
@@ -175,9 +249,10 @@
 
         <template v-slot:footer>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" @click="update()">Save</button>
         </template>
 
-</modal-component>
+    </modal-component>
 </template>
 
 <script>
@@ -211,6 +286,71 @@ import axios from 'axios';
             }
         },
         methods: {
+            update() {
+                let formData = new URLSearchParams({
+                    'title': this.$store.state.item.title,
+                    'description': this.$store.state.item.description,
+                    'status': this.$store.state.item.status,
+                    'start_date': this.$store.state.item.start_date,
+                    'end_date': this.$store.state.item.end_date,
+                    'finish_date': this.$store.state.item.status == 'Completed' ? new Date().toISOString().slice(0, 10) : ''
+                });
+
+                let config = {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': this.token
+                    }
+                }
+
+                console.log(formData);
+
+                let url = this.url + '/' + this.$store.state.item.id;
+
+                axios.put(url, formData, config)
+                    .then(response => {
+                        console.log(response);
+                        this.$store.state.transaction.status = 'success';
+                        this.$store.state.transaction.message = 'Task ID ' + this.$store.state.item.id + ' updated!' ;
+
+                        this.list();
+
+                    })
+                    .catch(errors => {
+                        this.$store.state.transaction.status = 'error';
+                        this.$store.state.transaction.message = errors.response.data.message;
+                    });
+            },
+            destroy() {
+                let confirmation = confirm('Remove Task?')
+
+                if (!confirmation) {
+                    return false;
+                }
+
+                let config = {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': this.token
+                    }
+                }
+
+                let url = this.url + '/' + this.$store.state.item.id;
+
+                axios.delete(url, config)
+                    .then(response => {
+                        this.$store.state.transaction.status = 'success';
+                        this.$store.state.transaction.message = response.data.message;
+
+                        this.list();
+                    })
+                    .catch(errors => {
+
+                        this.$store.state.transaction.status = 'error';
+                        this.$store.state.transaction.message = errors.response.data.message;
+                    });
+
+            },
             searching() {
                 let config = {
                     headers: {
@@ -273,7 +413,7 @@ import axios from 'axios';
                         this.storeDetails = {
                             message: 'Task ID created: ' + response.data.data.id
                         };
-                        
+                        this.list();
                         console.log(response);
                     })
                     .catch(errors => {
