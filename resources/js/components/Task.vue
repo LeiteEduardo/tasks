@@ -9,7 +9,7 @@
                             <div class="col-lg-4 mb-3">
                                 <input-container-component 
                                     id="taskId" 
-                                    title="TaskId"
+                                    title="ID"
                                     helper-id="taskIdHelp"
                                     helper-text="Optional. Insert Task ID"
                                 >
@@ -31,9 +31,9 @@
                             <div class="col-lg-4 mb-3">
                                 <input-container-component 
                                     id="taskStatus" 
-                                    title="TaskStatus"
+                                    title="Status"
                                     helper-id="taskStatusHelp"
-                                    helper-text="Optional. Insert Task status"
+                                    helper-text="Optional. Select Task status"
                                 >
                                 <select class="form-select" id="taskStatus" aria-label="Default select example" aria-describedby="taskStatusHelp" v-model="search.status">
                                     <option value="Not Started">Not Started</option>
@@ -60,7 +60,8 @@
                                 'status': {title: 'Status', type: 'text'},
                                 'start_date': {title: 'Start Date', type: 'date'},
                                 'end_date': {title: 'End Date', type: 'date'},
-                                'finish_date': {title: 'Finish Data', type: 'date'}
+                                'finish_date': {title: 'Finish Data', type: 'date'},
+                                'responsible': {title: 'Responsible', type: 'text'}
                         }" 
                             :data="this.tasks.data"
                             :view="{ visible: true, dataToggle: 'modal', dataTarget: '#modalTaskView'}"
@@ -139,6 +140,18 @@
                     </input-container-component>
                 </div>
             </div>
+            <div class="form-group mb-3">
+                <input-container-component 
+                    id="taskResponsible" 
+                    title="Responsible"
+                    helper-id="taskResponsibleHelp"
+                    helper-text="Optional. Insert Task Responsible"
+                >
+                    <select class="form-select" id="taskResponsible" aria-label="Default select example" aria-describedby="taskResponsibleHelp" v-model="storeResponsible">
+                        <option v-for="obj in users" :value="obj.id">{{ obj.name}}</option>
+                    </select>
+                </input-container-component>
+            </div>
         </template>
 
         <template v-slot:footer>
@@ -171,6 +184,9 @@
                 <input type="text" class="form-control" :value="$store.state.item.status" disabled>
             </input-container-component>
 
+            <input-container-component id="viewResponsible" title="Responsible" helper-id="" helper-text="">
+                <input type="text" class="form-control" :value="$store.state.item.responsible" disabled>
+            </input-container-component>
         </template>
 
         <template v-slot:footer>
@@ -197,6 +213,10 @@
 
             <input-container-component id="viewDesc" title="Description" helper-id="" helper-text="">
                 <input type="text" class="form-control" :value="$store.state.item.description" disabled>
+            </input-container-component>
+
+            <input-container-component id="viewResponsible" title="Responsible" helper-id="" helper-text="">
+                <input type="text" class="form-control" :value="$store.state.item.responsible" disabled>
             </input-container-component>
 
         </template>
@@ -241,7 +261,7 @@
                     id="updateTaskStatus" 
                     title="Status"
                     helper-id="updateTaskStatusHelp"
-                    helper-text="Required. Insert Task Status"
+                    helper-text="Required. Select Task Status"
                 >
                     <select class="form-select" id="updateTaskStatus" aria-label="Default select example" aria-describedby="updateTaskStatusHelp" v-model="$store.state.item.status" required>
                         <option value="Not Started" :selected="$store.state.item.status == 'Not Started'">Not Started</option>
@@ -271,6 +291,11 @@
                         <input type="date" class="form-control" id="updateEndDate" placeholder="End Date" aria-describedby="updateEndDateHelp" v-model="$store.state.item.end_date" required>
                     </input-container-component>
                 </div>
+            </div>
+            <div class="form-group mb-3">
+                <input-container-component id="viewResponsible" title="Responsible" helper-id="" helper-text="">
+                <input type="text" class="form-control" :value="$store.state.item.responsible" disabled>
+            </input-container-component>
             </div>
         </template>
 
@@ -305,9 +330,11 @@ import axios from 'axios';
                 storeTaskDesc: '',
                 storeStartDate: '',
                 storeEndDate: '',
+                storeResponsible: '',
                 storeStatus: '',
                 storeDetails: {},
                 tasks: { data: [] },
+                users: { data: [] },
                 tasksLinks: [],
                 search: { id: '', title: '', status: ''}
             }
@@ -437,6 +464,7 @@ import axios from 'axios';
                     'description': this.storeTaskDesc,
                     'start_date': this.storeStartDate,
                     'end_date': this.storeEndDate,
+                    'responsible_id': this.storeResponsible,
                 });
 
                 let config = {
@@ -461,10 +489,29 @@ import axios from 'axios';
                             message: errors.response.data.message
                         };
                     });
+            },
+            getAllUsers() {
+                let config = {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': this.token
+                    }
+                }
+
+                let url = 'http://localhost:9000/api/v1/users'
+
+                axios.get(url, config)
+                    .then(response => {
+                        this.users = response.data.data;
+                    })
+                    .catch(errors => {
+                        console.log(errors);
+                    });
             }
         },
         mounted() {
             this.list();
+            this.getAllUsers();
         }
     }
 </script>
